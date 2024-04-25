@@ -1,16 +1,9 @@
-###dP/dt = P(f(t) - g(t))
-###f(t) = f0 - f1P
-###g(t) = go - g1P
-###dP/dt = P * (f0 - f1P) - go )
-###dP/dt = f0P - f1P2 - goP
-###dP/dt = -f1P (f0 go/f1 - P)
-###dP/dt = kP( M - P)
+###This code is designed to calculate the population change in a given year based on the population change of rabbits and foxes. This implements an equation called Lotka-Volterra function, and it takes an initial popukation, a growth rate, and a death rate as inputs. It then calculates the population change for the next year and returns the result.
 
-###def pop_increase(current_pop, growth_rate)
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from scipy.integrate import odeint
 
 def lotka_volterra(t, y, alpha, beta, delta, gamma):
     rabbit_pop, fox_pop = y
@@ -34,4 +27,21 @@ gamma = 0.1 #Fox death rate
 
 plt.plot(years, rabbits, label="Rabbits")
 plt.plot(years, foxes, label="Foxes")
+plt.show()
+
+initial_population = [rabbits[0], foxes[0]]
+t = np.linspace(0, len(years), len(years)*10)
+solution = odeint(lotka_volterra, initial_population, t, args=(alpha, beta, delta, gamma))
+rabbit_solution, fox_solution = solution.T
+
+plt.figure(figsize=(10,6))
+plt.plot(years, rabbits, 'ro', label='Rabbits')
+plt.plot(years, foxes, 'bo', label='Foxes')
+plt.plot(years, rabbit_solution, 'r-', label='Rabbit Model')
+plt.plot(years, fox_solution, 'b-', label='Fox Model')
+plt.title('Population Dynamics of Rabbits and Foxes')
+plt.xlabel('Year')
+plt.ylabel('Population')
+plt.legend()
+plt.grid(True)
 plt.show()

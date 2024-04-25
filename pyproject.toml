@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "scientific-programming-belto002-1"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "scientific_programming_belto002_1"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "1.26.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
