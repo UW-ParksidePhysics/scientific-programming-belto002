@@ -11,3 +11,6 @@
 2032, 1500, 100
 2033, 1433, 125
 2034, 1250, 143
+
+### Data comes from here. https://tasks.illustrativemathematics.org
+###/content-standards/tasks/816 143
