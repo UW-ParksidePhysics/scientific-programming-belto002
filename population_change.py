@@ -25,9 +25,15 @@ rabbits = data[:, 1]
 foxes = data[:, 2]
 
 # Fit Lotka-Volterra model to data
-[optimal_parameters, covariance_matrix] = curve_fit(lotka_volterra, (rabbits[:-1],
-                                                                     foxes[:-1]), (rabbits[1:], foxes[1:]),
-                                                    bounds=(0, np.inf))
+fit_result = curve_fit(lotka_volterra, (rabbits[:-1],
+                                        foxes[:-1]), (rabbits[1:], foxes[1:]),
+                       bounds=(0, np.inf))
+
+optimal_parameters = fit_result[0]
+covariance_matrix = fit_result[1]
+
+print("Optimal Parameters:", optimal_parameters)
+print("Covariance Matrix:", covariance_matrix)
 
 initial_populations = [rabbits[0], foxes[0]]
 
@@ -54,21 +60,21 @@ plt.ylabel('Population')
 
 plt.grid(True)
 
-start_year, stop_year = 2023, 2040
-number_of_years = stop_year - start_year
-years = np.linspace(start_year, stop_year, number_of_years)
+# start_year, stop_year = 2023, 2040
+# number_of_years = stop_year - start_year
+# years = np.linspace(start_year, stop_year, number_of_years)
 
-current_population = np.array(initial_populations)
-populations_by_year = [current_population]
+# current_population = np.array(initial_populations)
+# populations_by_year = [current_population]
 
-populations_by_year = np.array(populations_by_year)
-years = np.append(years, years[-1] + 1)
+# populations_by_year = np.array(populations_by_year)
+# years = np.append(years, years[-1] + 1)
 # plt.plot(years, populations_by_year[:,0], years, populations_by_year[:,1])
 plt.legend()
 plt.show()
 
-print("Optimized parameter values")
-print("Alpha", optimal_parameters[0])
-print("Beta", optimal_parameters[1])
-print("Gamma", optimal_parameters[2])
-print("Delta", optimal_parameters[3])
+# print("Optimized parameter values")
+# print("Alpha", optimal_parameters[0])
+# print("Beta", optimal_parameters[1])
+# print("Gamma", optimal_parameters[2])
+# print("Delta", optimal_parameters[3])
