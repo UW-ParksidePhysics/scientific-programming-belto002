@@ -1,0 +1,150 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from scipy.constants import physical_constants
+from datetime import datetime
+
+# Constants for unit conversion
+bohr_to_angstrom = physical_constants['Bohr radius'][0] * 1e10  # Bohr to Angstrom
+rydberg_to_ev = physical_constants['Rydberg constant times hc in eV'][0]  # Rydberg to eV
+rydberg_per_bohr_to_gpa = (physical_constants['Rydberg constant times hc in eV'][0] /
+                           (physical_constants['Bohr radius'][0] * 1e9) ** 3) * 1e-9  # Rydberg/Bohr to GPa
+
+def parse_file_name(file_name):
+    elements = file_name.split('.')
+    chemical_symbol = elements[0]
+    symmetry_symbol = elements[1]
+    exchange_acronym = elements[2]
+    return chemical_symbol, symmetry_symbol, exchange_acronym
+
+def read_two_columns_text(filename):
+    data = np.loadtxt(filename)
+    return data[:, 0], data[:, 1]
+
+def calculate_bivariate_statistics(x, y):
+    mean_x = np.mean(x)
+    mean_y = np.mean(y)
+    std_x = np.std(x)
+    std_y = np.std(y)
+    return mean_x, mean_y, std_x, std_y
+
+def calculate_quadratic_fit(x, y):
+    coefficients = np.polyfit(x, y, 2)
+    return coefficients
+
+def fit_eos(x, a, b, c):
+    return a * x ** 2 + b * x + c
+
+def convert_units(value, from_unit, to_unit):
+    if from_unit == "bohr_per_atom" and to_unit == "cubic_angstroms_per_atom":
+        return value * bohr_to_angstrom
+    elif from_unit == "rydberg_per_atom" and to_unit == "electron_volts_per_atom":
+        return value * rydberg_to_ev
+    elif from_unit == "rydberg_per_bohr" and to_unit == "gigapascals":
+        return value * rydberg_per_bohr_to_gpa
+    else:
+        return None
+
+def annotate_graph(chemical_symbol, symmetry_symbol, bulk_modulus):
+    plt.text(0.02, 0.98, chemical_symbol, transform=plt.gca().transAxes, fontsize=12, va='top')
+    plt.text(0.5, 0.5, symmetry_symbol, transform=plt.gca().transAxes, fontsize=12, va='top', ha='center', style='italic')
+    plt.text(0.5, 0.6, f'K0 {bulk_modulus:.1f} GPa', transform=plt.gca().transAxes, fontsize=10, va='top', ha='center')
+    plt.axvline(x=v0, linestyle='--', color='k')
+    plt.text(0.02, 0.02, f'Created by Jackson Beltoya ({datetime.now().isoformat()})', transform=plt.gca().transAxes, fontsize=8, va='bottom')
+
+if __name__ == '__main__':
+    file_name = "Sn.Fd-3m.GGA-PBE.volumes_energies.dat"
+    chemical_symbol, symmetry_symbol, exchange_acronym = parse_file_name(file_name)
+
+    # Read data
+    x_data, y_data = read_two_columns_text(file_name)
+
+    # If needed, divide by the number of atoms
+    # Assuming symmetry_symbol is either "Fd3m" or "Fm3m"
+    if symmetry_symbol == "Fd3m":
+        x_data /= 2
+
+    # Pull out statistics on the data set
+    mean_x, mean_y, std_x, std_y = calculate_bivariate_statistics(x_data, y_data)
+
+    # Fit a quadratic polynomial to the data
+    quadratic_coefficients = calculate_quadratic_fit(x_data, y_data)
+
+    # Fit EOS
+    v0 = -quadratic_coefficients[1] / (2 * quadratic_coefficients[0])
+    bulk_modulus = -2 * quadratic_coefficients[0] * v0
+
+    # Convert units
+    v0 = convert_units(v0, "bohr_per_atom", "cubic_angstroms_per_atom")
+    bulk_modulus = convert_units(bulk_modulus, "rydberg_per_bohr", "gigapascals")
+
+    # Plot data and fit function
+    plt.scatter(x_data, y_data, color='blue', label='Data')
+    x_fit = np.linspace(min(x_data), max(x_data), 100)
+    y_fit = fit_eos(x_fit, *quadratic_coefficients)
+    plt.plot(x_fit, y_fit, color='black', label='Fit', linewidth=2)
+    plt.xlabel(r'V (Å$^3$/atom)')
+    plt.ylabel(r'E (eV/atom)')
+    plt.xlim(min(x_data) - 0.1 * (max(x_data) - min(x_data)), max(x_data) + 0.1 * (max(x_data) - min(x_data)))
+    plt.ylim(min(y_data) - 0.1 * (max(y_data) - min(y_data)), max(y_data) + 0.1 * (max(y_data) - min(y_data)))
+    plt.title(f'Quadratic Equation of State for {chemical_symbol} in DFT ({exchange_acronym})')
+    annotate_graph(chemical_symbol, symmetry_symbol, bulk_modulus)
+
+    # Display or save graph based on display_graph variable
+    display_graph = False  # Set it to True when you commit to your git repository
+    if display_graph:
+        plt.show()
+    else:
+        plt.savefig(f'Beltoya.Sn.Fd-3m.QuadraticEquationOfState.png')
+
+        import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+# Function to generate the matrix - assuming it's defined elsewhere
+def generate_matrix(params):
+    # Your implementation of generating the matrix
+    pass
+
+# Function to calculate lowest eigenvectors - assuming it's defined elsewhere
+def calculate_lowest_eigenvectors(matrix):
+    # Your implementation of calculating lowest eigenvectors
+    pass
+
+# Generate the matrix according to parameters
+matrix = generate_matrix(params)  # Assuming params are defined elsewhere
+
+# Calculate the lowest eigenvectors and eigenvalues
+eigenvectors, eigenvalues = calculate_lowest_eigenvectors(matrix)
+
+# Generate grid of spatial points
+Ndim = 100
+grid = np.linspace(-10, 10, Ndim)
+
+# Plot eigenvectors
+plt.figure()
+for i, eigenvector in enumerate(eigenvectors):
+    # Ensure lowest eigenvalue eigenvector is positive if its components are negative
+    if i == 0 and np.any(eigenvector < 0):
+        eigenvector *= -1
+
+    # Plot eigenvector against grid
+    plt.plot(grid, eigenvector, label=f'ψ{i}, E{i} = {eigenvalues[i]:.3f} a.u.')
+
+# Set axis labels and limits
+plt.xlabel('x [a.u.]')
+plt.ylabel('ψ(x) [a.u.]')
+plt.ylim(-2 * np.max(np.abs(eigenvectors)), 2 * np.max(np.abs(eigenvectors)))
+plt.axhline(0, color='black', linewidth=1)
+
+# Add legend and annotations
+plt.legend()
+plt.title(f'Select Wavefunctions for a Harmonic Potential on a Spatial Grid of {Ndim} Points')
+plt.text(0.02, 0.02, f'Created by Jackson Beltoya ({datetime.now().isoformat()})', transform=plt.gca().transAxes, fontsize=8, va='bottom')
+
+# Determine whether to display or save graph
+display_graph = False  # Set to True when committing to repository
+if display_graph:
+    plt.show()
+else:
+    plt.savefig(f'Wavefunctions_Harmonic_Potential_{Ndim}_Points.png')

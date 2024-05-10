@@ -1,34 +1,21 @@
-import math
+"""
+This script calculates the sum of a birth month and date.
 
-drag_coefficient = 0.2  # unitless
-air_density = 1.2  # kg/m^3
-radius = 11 / 100  # m
-cross_area = math.pi * radius ** 2  # m^2
-ball_mass = 0.43  # kg
-gravitational_acceleration = 9.81  # m/s^2
+__author__ = "Jackson"
+"""
 
-# Convert velocities from km/h to m/s
-v_hard_kick = 120 * 1000 / 3600  # m/s
-v_soft_kick = 10 * 1000 / 3600  # m/s
+# Assigning a birth month and a date
+birth_month = 2
+birth_date = 6
 
-# Calculating drag force and gravity force for hard kick
-drag_force_hard_kick = 0.5 * drag_coefficient * air_density * cross_area * v_hard_kick ** 2  # N
-gravitational_force_hard_kick = ball_mass * gravitational_acceleration  # N
+# Adding the date and month
+birth_sum = birth_month + birth_date
 
-# Calculating drag force and gravity force for soft kick
-drag_force_soft_kick = 0.5 * drag_coefficient * air_density * cross_area * v_soft_kick ** 2  # N
-gravitational_force_soft_kick = ball_mass * gravitational_acceleration  # N
+# printing the sum
+print("Birth Sum:", birth_sum)
 
-# Ratio of drag force to gravity force for hard kick and soft kick
-drag_gravity_ratio_hard_kick = drag_force_hard_kick / gravitational_force_hard_kick
-drag_gravity_ratio_soft_kick = drag_force_soft_kick / gravitational_force_soft_kick
-
-print(f"For a hard kick at {v_hard_kick:.2f} m/s:")
-print(f"Drag Force: {drag_force_hard_kick:.1f} N")
-print(f"Gravity Force: {gravitational_force_hard_kick:.1f} N")
-print(f"Ratio of Drag Force to Gravity Force: {drag_gravity_ratio_hard_kick:.2f}")
-
-print(f"\nFor a soft kick at {v_soft_kick:.2f} m/s:")
-print(f"Drag Force: {drag_force_soft_kick:.1f} N")
-print(f"Gravity Force: {gravitational_force_soft_kick:.1f} N")
-print(f"Ratio of Drag Force to Gravity Force: {drag_gravity_ratio_soft_kick:.2f}")
+if __name__ == "__main__":
+    # Test case: Input birth_month = 2, birth_date = 6
+    # Expected output: birth_sum = 8
+    assert birth_sum == 8, f"Test failed! Expected birth_sum to be 8, but got {birth_sum}"
+    print("Test passed!")

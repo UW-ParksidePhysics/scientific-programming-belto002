@@ -1,0 +1,53 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+# Function to fit the data
+def func(x, a, b):
+    return a * x + b
+
+# Function to generate matrix
+def generate_matrix(n):
+    return np.random.rand(n, n)
+
+def plot_data_fit(x_data, y_data, popt, func_name):
+    plt.scatter(x_data, y_data, label='Data')
+    plt.plot(x_data, func(x_data, *popt), 'r-', label='Fit: a=%5.3f, b=%5.3f' % tuple(popt))
+    plt.xlabel('Volume')
+    plt.ylabel('Energy')
+    plt.legend()
+    plt.title('Data and Fit Curve')
+    plt.grid(True)
+    plt.savefig(f'Beltoya.Sn.Fd-3m.{func_name}EquationOfState.png')
+    plt.close()
+
+def plot_eigenvectors(matrix, eigenvector_index, potential_name):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    x = np.linspace(-5, 5, 100)
+    y = np.linspace(-5, 5, 100)
+    X, Y = np.meshgrid(x, y)
+    ax.plot_surface(X, Y, matrix[:, eigenvector_index].reshape(3, 3), alpha=0.5, label=f'Eigenvector {eigenvector_index+1}')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title('Eigenvectors')
+    plt.savefig(f'Beltoya.{potential_name}.Eigenvector{eigenvector_index+1}.png')
+    plt.close()
+
+if __name__ == '__main__':
+    # Read data from file
+    data = np.loadtxt("Sn.Fd-3m.GGA-PBE.volumes_energies.dat")
+    x_data = data[:, 0]
+    y_data = data[:, 1]
+
+    # Fit the data
+    popt, _ = curve_fit(func, x_data, y_data)
+    plot_data_fit(x_data, y_data, popt, "Linear")
+
+    # Generate matrix
+    matrix = generate_matrix(3)
+
+    # Plot select three eigenvectors against a grid of points in space
+    for i in range(3):
+        plot_eigenvectors(matrix, i, "Potential")
